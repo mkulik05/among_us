@@ -1,7 +1,7 @@
 const Telegraf = require('telegraf')
 const Extra = require('telegraf/extra')
 const Markup = require('telegraf/markup')
-const bot = new Telegraf("1467719423:AAEGHF82LHqyJ0IeFMm_iHW_Ms1unutdbOs")
+const bot = new Telegraf("1309705758:AAHoR0j4hCINgeZVr4Wao51t21wpUpMJI8w")
 
 const keyboard = Markup.inlineKeyboard([
   Markup.callbackButton('1', '1'),
