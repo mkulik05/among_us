@@ -1,7 +1,7 @@
 const Telegraf = require('telegraf')
 const Extra = require('telegraf/extra')
 const Markup = require('telegraf/markup')
-const bot = new Telegraf("1309705758:AAHoR0j4hCINgeZVr4Wao51t21wpUpMJI8w")
+const bot = new Telegraf("1448775683:AAHYrTikXlvfJfMyvAkc34MCd9007-wuC8Q")
 
 const keyboard = Markup.inlineKeyboard([
   Markup.callbackButton('1', '1'),
@@ -14,18 +14,20 @@ let tasks = {}
 let players = []
 is_imposter = {}
 bot.start((ctx) => {
-  if (!tasks.includes(ctx.chat.id)) {
+
+  if (!players.includes(ctx.chat.id)) {
     players.push(ctx.chat.id)
     tasks[ctx.chat.id] = []
     console.log(players)
-    return ctx.reply('Привет! Выбери свою роль', Markup
+  }
+ 
+  return ctx.reply('Привет! Выбери свою роль', Markup
     .keyboard([
       ['Импостер', 'Мирный'],
     ]).oneTime().resize().extra()
-    )}
- 
-  
+    )
   })
+
 bot.help((ctx) => ctx.reply('Help message'))
 
 
