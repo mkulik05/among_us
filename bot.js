@@ -45,6 +45,15 @@ let is_imposter = {}
 let num_of_tasks  = 4;
 let num_of_impostors = 5
 
+let game_menu = () => {
+  return Markup
+  .keyboard([
+    ['Заявить о сделанном задании'],
+    ['📢 репорт'],
+    ['Сделать саботаж']
+  ]).oneTime().resize().extra()
+}
+
 bot.start((ctx) => {
   let id  = ctx.chat.id.toString()
   if (!players.includes(id)){
@@ -97,12 +106,7 @@ bot.hears('Начать игру', (ctx) => {
     } else {
       role = "Мирный"
     }
-    bot.telegram.sendMessage(players[i], "Игра начата!!! Ваша роль: "+ role, Markup
-    .keyboard([
-      ['Заявить о сделанном задании'],
-      ['📢 репорт'],
-      ['Сделать саботаж']
-    ]).oneTime().resize().extra())
+    bot.telegram.sendMessage(players[i], "Игра начата!!! Ваша роль: "+ role, game_menu())
   }
 })
 
@@ -115,79 +119,27 @@ bot.action('change_num_of_tasks', (ctx) => {
   return ctx.reply('Выберите кол-во заданий', Extra.markup(settings_tasks))
 })
 
-bot.action('impostor_1', (ctx) => {
-  num_of_impostors = 1
-  return ctx.reply('Принято', Markup
-  .keyboard([
-    ['Настройки', 'Начать игру'],
-  ]).oneTime().resize().extra())
-})
+for (let i = 1; i<5; i++) {
+  bot.action('impostor_'+i, (ctx) => {
+    num_of_impostors = i
+    return ctx.reply('Принято', Markup
+    .keyboard([
+      ['Настройки', 'Начать игру'],
+    ]).oneTime().resize().extra())
+  })
+  
+}
 
-bot.action('impostor_2', (ctx) => {
-  num_of_impostors = 2
-  return ctx.reply('Принято', Markup
-  .keyboard([
-    ['Настройки', 'Начать игру'],
-  ]).oneTime().resize().extra())
-})
+for (let i = 1; i<6; i++) { 
+  bot.action('task_'+i, (ctx) => {
+    num_of_tasks = i
+    return ctx.reply('Принято', Markup
+    .keyboard([
+      ['Настройки', 'Начать игру'],
+    ]).oneTime().resize().extra())
+  })
+}
 
-bot.action('impostor_3', (ctx) => {
-  num_of_impostors = 3
-  return ctx.reply('Принято', Markup
-  .keyboard([
-    ['Настройки', 'Начать игру'],
-  ]).oneTime().resize().extra())
-})
-
-bot.action('impostor_4', (ctx) => {
-  num_of_impostors = 4
-  return ctx.reply('Принято', Markup
-  .keyboard([
-    ['Настройки', 'Начать игру'],
-  ]).oneTime().resize().extra())
-})
-
-
-bot.action('task_1', (ctx) => {
-  num_of_tasks = 1
-  return ctx.reply('Принято', Markup
-  .keyboard([
-    ['Настройки', 'Начать игру'],
-  ]).oneTime().resize().extra())
-})
-
-
-bot.action('task_2', (ctx) => {
-  num_of_tasks = 2
-  return ctx.reply('Принято', Markup
-  .keyboard([
-    ['Настройки', 'Начать игру'],
-  ]).oneTime().resize().extra())
-})
-
-bot.action('task_3', (ctx) => {
-  num_of_tasks = 3
-  return ctx.reply('Принято', Markup
-  .keyboard([
-    ['Настройки', 'Начать игру'],
-  ]).oneTime().resize().extra())
-})
-
-bot.action('task_4', (ctx) => {
-  num_of_tasks = 4
-  return ctx.reply('Принято', Markup
-  .keyboard([
-    ['Настройки', 'Начать игру'],
-  ]).oneTime().resize().extra())
-})
-
-bot.action('task_5', (ctx) => {
-  num_of_tasks = 5
-  return ctx.reply('Принято', Markup
-  .keyboard([
-    ['Настройки', 'Начать игру'],
-  ]).oneTime().resize().extra())
-})
 
 bot.hears('Настройки', (ctx) => {
   return ctx.reply('Хорошо', Extra.markup(settings))
@@ -196,49 +148,23 @@ bot.hears('Настройки', (ctx) => {
 bot.help((ctx) => ctx.reply('Help message'))
 
 
-bot.hears('Импостер', (ctx) => {
-  is_imposter[ctx.chat.id.toString()] = 1
-  return ctx.reply('Хорошо', Markup
-  .keyboard([
-    ['Заявить о сделанном задании'],
-    ['📢 репорт'],
-    ['Сделать саботаж']
-  ]).oneTime().resize().extra()
+// bot.hears('Импостер', (ctx) => {
+//   is_imposter[ctx.chat.id.toString()] = 1
+//   return ctx.reply('Хорошо', game_menu())
+// })
 
-)
-})
-
-bot.hears('Мирный', (ctx) => {
-  is_imposter[ctx.chat.id.toString()] = 0
-  return ctx.reply('Хорошо', Markup
-  .keyboard([
-    ['Заявить о сделанном задании'],
-    ['📢 репорт'],
-    ['Сделать саботаж']
-  ]).oneTime().resize().extra()
-
-)
-})
+// bot.hears('Мирный', (ctx) => {
+//   is_imposter[ctx.chat.id.toString()] = 0
+//   return ctx.reply('Хорошо',game_menu())
+// })
 
 bot.hears('Сделать саботаж', (ctx) => {
 if (is_imposter[ctx.chat.id.toString()]) {
   for (let i = 0; i< players.length; i++){
-    bot.telegram.sendMessage(players[i], "Саботаж!!!!!!", Markup
-    .keyboard([
-      ['Заявить о сделанном задании'],
-      ['📢 репорт'],
-      ['Сделать саботаж']
-    ]).oneTime().resize().extra())
+    bot.telegram.sendMessage(players[i], "Саботаж!!!!!!", game_menu())
   }
 } else {
-  return ctx.reply('Ты не импостер!!!', Markup
-  .keyboard([
-    ['Заявить о сделанном задании'],
-    ['📢 репорт'],
-    ['Сделать саботаж']
-  ]).oneTime().resize().extra()
-
-)
+  return ctx.reply('Ты не импостер!!!', game_menu())
 }
 })
 
@@ -252,178 +178,47 @@ bot.hears('📢 репорт', (ctx) => {
     if (last_name == 'undefined') {
       last_name = ''
     }
-    bot.telegram.sendMessage(players[i], username + " " + last_name+" отправил(а) репорт!!!", Markup
-    .keyboard([
-      ['Заявить о сделанном задании'],
-      ['📢 репорт'],
-      ['Сделать саботаж']
-    ]).oneTime().resize().extra())
+    bot.telegram.sendMessage(players[i], username + " " + last_name+" отправил(а) репорт!!!", game_menu())
   }
-  return ctx.reply('Принято'), Markup
-  .keyboard([
-    ['Заявить о сделанном задании'],
-    ['📢 репорт'],
-    ['Сделать саботаж']
-  ]).oneTime().resize().extra()
+  // return ctx.reply('Принято'), Markup
+  // .keyboard([
+  //   ['Заявить о сделанном задании'],
+  //   ['📢 репорт'],
+  //   ['Сделать саботаж']
+  // ]).oneTime().resize().extra()
 })
 
 let points = 0
 
-let actions = ['1','2','3','4']
-bot.action('1', (ctx) => {
-  console.log(players)
-  let id = ctx.chat.id.toString()
-  if (Object.keys(tasks).includes(id)) {
-    if (!tasks[id].includes(actions[0])) {
-      tasks[id].push(actions[0])
-      points+=1
-      if (points >= num_of_tasks * (players.length - Object.keys(is_imposter).length)) {
-        for (let i = 0; i< players.length; i++){
-          bot.telegram.sendMessage(players[i], "Все задания выполнены!!! Мирные победили", Markup
-    .keyboard([
-      ['Заявить о сделанном задании'],
-      ['📢 репорт'],
-      ['Сделать саботаж']
-    ]).oneTime().resize().extra())
+for (let i = 1; i<5; i++) { 
+  bot.action(''+i, (ctx) => {
+    console.log(players)
+    let id = ctx.chat.id.toString()
+    if (Object.keys(tasks).includes(id)) {
+      if (!tasks[id].includes(''+i)) {
+        tasks[id].push(''+i)
+        points+=1
+        if (points >= num_of_tasks * (players.length - Object.keys(is_imposter).length)) {
+          for (let i = 0; i< players.length; i++){
+            bot.telegram.sendMessage(players[i], "Все задания выполнены!!! Мирные победили", Markup
+      .keyboard([
+        ['Заявить о сделанном задании'],
+        ['📢 репорт'],
+        ['Сделать саботаж']
+      ]).oneTime().resize().extra())
+          }
         }
+      } else {
+        return ctx.reply('Вы уже выполнили это задание!!!', game_menu())
       }
     } else {
-      return ctx.reply('Вы уже выполнили это задание!!!', Markup
-      .keyboard([
-        ['Заявить о сделанном задании'],
-        ['📢 репорт'],
-        ['Сделать саботаж']
-      ]).oneTime().resize().extra())
-    }
-  } else {
-    tasks[id] = [actions[0]]
-    points+=1
-    players.push(id)
-  }
-  return ctx.reply('Записано', Markup
-  .keyboard([
-    ['Заявить о сделанном задании'],
-    ['📢 репорт'],
-    ['Сделать саботаж']
-  ]).oneTime().resize().extra())
-})
-
-bot.action('2', (ctx) => {
-  console.log(players)
-  id = ctx.chat.id.toString()
-  if (Object.keys(tasks).includes(id)) {
-    if (!tasks[id].includes(actions[1])) {
-      tasks[id].push(actions[1])
+      tasks[id] = [''+i]
       points+=1
-      if (points >= num_of_tasks * (players.length - Object.keys(is_imposter).length)) {
-        for (let i = 0; i< players.length; i++){
-          bot.telegram.sendMessage(players[i], "Все задания выполнены!!! Мирные победили", Markup
-    .keyboard([
-      ['Заявить о сделанном задании'],
-      ['📢 репорт'],
-      ['Сделать саботаж']
-    ]).oneTime().resize().extra())
-        }
-      }
-    }else {
-      return ctx.reply('Вы уже выполнили это задание!!!', Markup
-      .keyboard([
-        ['Заявить о сделанном задании'],
-        ['📢 репорт'],
-        ['Сделать саботаж']
-      ]).oneTime().resize().extra())
+      players.push(id)
     }
-  } else {
-    tasks[id] = [actions[1]]
-    points+=1
-    players.push(id)
-  }
-  return ctx.reply('Записано'), Markup
-  .keyboard([
-    ['Заявить о сделанном задании'],
-    ['📢 репорт'],
-    ['Сделать саботаж']
-  ]).oneTime().resize().extra()
-})
-bot.action('3', (ctx) => {
-  console.log(players)
-  id = ctx.chat.id.toString()
-  if (Object.keys(tasks).includes(id)) {
-    if (!tasks[id].includes(actions[2])) {
-      tasks[id].push(actions[2])
-      points+=1
-      console.log(num_of_tasks * (players.length - Object.keys(is_imposter).length), points, players)
-      if (points >= num_of_tasks * (players.length - Object.keys(is_imposter).length)) {
-        console.log("yeee")
-        for (let i = 0; i< players.length; i++){
-          bot.telegram.sendMessage(players[i], "Все задания выполнены!!! Мирные победили", Markup
-    .keyboard([
-      ['Заявить о сделанном задании'],
-      ['📢 репорт'],
-      ['Сделать саботаж']
-    ]).oneTime().resize().extra())
-        }
-      }
-    }else {
-      return ctx.reply('Вы уже выполнили это задание!!!', Markup
-      .keyboard([
-        ['Заявить о сделанном задании'],
-        ['📢 репорт'],
-        ['Сделать саботаж']
-      ]).oneTime().resize().extra())
-    }
-  } else {
-    tasks[id] = [actions[2]]
-    points+=1
-    players.push(id)
-  }
-  return ctx.reply('Записано', Markup
-  .keyboard([
-    ['Заявить о сделанном задании'],
-    ['📢 репорт'],
-    ['Сделать саботаж']
-  ]).oneTime().resize().extra())
-
-})
-bot.action('4', (ctx) => {
-  console.log(players)
-  id = ctx.chat.id.toString()
-  if (Object.keys(tasks).includes(id)) {
-    if (!tasks[id].includes(actions[3])) {
-      tasks[id].push(actions[3])
-      points+=1
-      if (points >= num_of_tasks * (players.length - Object.keys(is_imposter).length)) {
-        for (let i = 0; i< players.length; i++){
-          bot.telegram.sendMessage(players[i], "Все задания выполнены!!! Мирные победили", Markup
-    .keyboard([
-      ['Заявить о сделанном задании'],
-      ['📢 репорт'],
-      ['Сделать саботаж']
-    ]).oneTime().resize().extra())
-        }
-      }
-      
-    } else {
-      return ctx.reply('Вы уже выполнили это задание!!!', Markup
-      .keyboard([
-        ['Заявить о сделанном задании'],
-        ['📢 репорт'],
-        ['Сделать саботаж']
-      ]).oneTime().resize().extra())
-    }
-  } else {
-    tasks[id] = [actions[3]]
-    points+=1
-    players.push(id)
-  }
-return ctx.reply('Записано', Markup
-.keyboard([
-  ['Заявить о сделанном задании'],
-  ['📢 репорт'],
-  ['Сделать саботаж']
-]).oneTime().resize().extra())  
-})
-
+    return ctx.reply('Записано', game_menu())
+  })
+}
 bot.hears('Заявить о сделанном задании', (ctx) => {
   if (is_imposter[ctx.chat.id.toString()]) {
     ctx.reply("Какое задание вы выполнили?",Extra.markup(keyboard_for_impostor))
