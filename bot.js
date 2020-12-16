@@ -12,20 +12,25 @@ const keyboard = Markup.inlineKeyboard([
 ])
 let tasks = {}
 let players = []
+is_imposter = {}
 bot.start((ctx) => {
-  players.push(ctx.chat.id)
-  tasks[ctx.chat.id] = []
-  console.log(players)
-  return ctx.reply('Привет! Выбери свою роль', Markup
-  .keyboard([
-    ['Импостер', 'Мирный'],
-  ]).oneTime().resize().extra()
-)
-})
+  if (!tasks.includes(ctx.chat.id)) {
+    players.push(ctx.chat.id)
+    tasks[ctx.chat.id] = []
+    console.log(players)
+    return ctx.reply('Привет! Выбери свою роль', Markup
+    .keyboard([
+      ['Импостер', 'Мирный'],
+    ]).oneTime().resize().extra()
+    )}
+ 
+  
+  })
 bot.help((ctx) => ctx.reply('Help message'))
 
 
 bot.hears('Импостер', (ctx) => {
+  is_imposter[ctx.chat.id] = 1
   return ctx.reply('Хорошо', Markup
   .keyboard([
     ['Заявить о сделанном задании'],
@@ -37,6 +42,7 @@ bot.hears('Импостер', (ctx) => {
 })
 
 bot.hears('Мирный', (ctx) => {
+  is_imposter[ctx.chat.id] = 0
   return ctx.reply('Хорошо', Markup
   .keyboard([
     ['Заявить о сделанном задании'],
@@ -46,6 +52,38 @@ bot.hears('Мирный', (ctx) => {
 
 )
 })
+
+bot.hears('Сделать саботаж', (ctx) => {
+if (is_imposter[ctx.chat.id]) {
+  for (let i = 0; i< players.length; i++){
+    bot.telegram.sendMessage(players[i], "Саботаж!!!!!!", Markup
+    .keyboard([
+      ['Заявить о сделанном задании'],
+      ['📢 репорт'],
+      ['Сделать саботаж']
+    ]).oneTime().resize().extra())
+  }
+//   return ctx.reply('Принято, импостер', Markup
+//   .keyboard([
+//     ['Заявить о сделанном задании'],
+//     ['📢 репорт'],
+//     ['Сделать саботаж']
+//   ]).oneTime().resize().extra()
+
+// )
+} else {
+  return ctx.reply('Ты не импостер!!!', Markup
+  .keyboard([
+    ['Заявить о сделанном задании'],
+    ['📢 репорт'],
+    ['Сделать саботаж']
+  ]).oneTime().resize().extra()
+
+)
+}
+})
+
+
 bot.hears('📢 репорт', (ctx) => {
   console.log(ctx.message.from.first_name)
   for (let i = 0; i< players.length; i++){
