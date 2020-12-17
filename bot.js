@@ -58,6 +58,7 @@ let players = []
 let is_imposter = {}
 let num_of_tasks  = 5;
 let num_of_impostors = 5
+let players_tasks = {}
 
 let game_menu = () => {
   return Markup
@@ -65,11 +66,17 @@ let game_menu = () => {
     ['Заявить о сделанном задании'],
     ['📢 репорт'],
     ['Сделать саботаж']
+    
+    
   ]).oneTime().resize().extra()
 }
 
 bot.start((ctx) => {
   let id  = ctx.chat.id.toString()
+  for (let i = 0; i < players.length; i++) {
+    bot.telegram.sendMessage(players[i], "Игрок " + ctx.message.from.first_name+ " присоединился")
+  }
+  
   if (!players.includes(id)){
     players.push(id)
     tasks[id] = []
@@ -181,7 +188,35 @@ if (is_imposter[ctx.chat.id.toString()]) {
   return ctx.reply('Ты не импостер!!!', game_menu())
 }
 })
+bot.hears('Да, удалить все', (ctx) => {
+  if (ctx.chat.id.toString() === players[0]) {
+  tasks = {}
+  players = []
+  is_imposter = {}
+  num_of_tasks  = 5;
+  num_of_impostors = 5
+  players_tasks = {}
+  return ctx.reply('Данные очищены', game_menu())
+  } else {
+    return ctx.reply('Действие запрещено', game_menu())
+  }
+})
 
+bot.hears('Нет, отмена', (ctx) => {
+  return ctx.reply('Действие отменено', game_menu())
+})
+bot.hears('clear_all', (ctx) => {
+  if (ctx.chat.id.toString() === players[0]) {
+
+    return ctx.reply('Вы уверены? Это необратимое действие!!!', Markup
+    .keyboard([
+      ['Да, удалить все', 'Нет, отмена'],
+    ]).oneTime().resize().extra())
+    
+  } else {
+    return ctx.reply('Действие запрещено', game_menu())
+  }
+})
 
 bot.hears('📢 репорт', (ctx) => {
   console.log(ctx.message.from.first_name)
@@ -189,7 +224,7 @@ bot.hears('📢 репорт', (ctx) => {
     let username = ctx.message.from.first_name
     let last_name = ctx.message.from.last_name
     console.log(last_name)
-    if (last_name == 'undefined') {
+    if (typeof last_name == 'undefined') {
       last_name = ''
     }
     bot.telegram.sendMessage(players[i], username + " " + last_name+" отправил(а) репорт!!!", game_menu())
@@ -240,6 +275,23 @@ for (let i = 1; i<11; i++) {
   
   )
 }
+
+let  shuffle = (array) => {
+  var currentIndex = array.length, temporaryValue, randomIndex;
+
+  while (0 !== currentIndex) {
+
+    randomIndex = Math.floor(Math.random() * currentIndex);
+    currentIndex -= 1;
+
+    temporaryValue = array[currentIndex];
+    array[currentIndex] = array[randomIndex];
+    array[randomIndex] = temporaryValue;
+  }
+
+  return array;
+}
+
 bot.hears('Заявить о сделанном задании', (ctx) => {
   let keyboard2= []
   for (let i = 0; i< keyboard.length; i++){
@@ -248,9 +300,26 @@ bot.hears('Заявить о сделанном задании', (ctx) => {
   console.log(keyboard2, keyboard)
   console.log(num_of_tasks)
   keyboard2 = keyboard2[0].concat(keyboard2[1])
-  console.log(keyboard2)
-  keyboard2 = keyboard2.splice(0, num_of_tasks)
-  console.log(keyboard2, keyboard)
+  id = ctx.chat.id.toString()
+  console.log(id, Object.keys(players_tasks), Object.keys(players_tasks).includes(id), players_tasks)
+  if (Object.keys(players_tasks).includes(id)) {
+    console.log(players_tasks)
+    keys = Object.keys(players_tasks).includes(id)
+    // let keyboard_copy = {}
+    // for (let key_i = 0; key_i<keys.length;key_i++) {
+    //   keyboard_copy[keys[i]] = players_tasks[keys[i]]
+    // }
+    keyboard2 = players_tasks[id]
+    // console.log(keyboard_copy)
+  } else {
+    keyboard2 = shuffle(keyboard2)
+    console.log(players_tasks, '--')
+    players_tasks[id] = keyboard2
+    console.log(players_tasks, '---')
+  }
+  console.log('\n?',players_tasks, "??")
+  keyboard2 = keyboard2.slice(0, num_of_tasks)
+  console.log(players_tasks, "?????????")
   let keyboard3 = []
   if (keyboard2.length>7) {
      keyboard3.push(keyboard2.slice(0,Math.trunc(keyboard2.length/2+1)))
@@ -259,8 +328,7 @@ bot.hears('Заявить о сделанном задании', (ctx) => {
   } else {
     keyboard3 = keyboard2
   }
-    console.log(keyboard3, keyboard2.slice(0,Math.trunc(keyboard2.length/2+1)), keyboard2.slice(Math.trunc(keyboard2.length/2+1)))
-    ctx.reply("Какое задание вы выполнили?",Extra.markup(create_keyboard(keyboard3)))
+   ctx.reply("Какое задание вы выполнили?",Extra.markup(create_keyboard(keyboard3)))
   
 })
 
