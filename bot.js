@@ -3,34 +3,48 @@ const Extra = require('telegraf/extra')
 const Markup = require('telegraf/markup')
 const bot = new Telegraf("1448775683:AAHYrTikXlvfJfMyvAkc34MCd9007-wuC8Q")
 
-const keyboard = Markup.inlineKeyboard([
-  Markup.callbackButton('1', '1'),
-  Markup.callbackButton('2', '2'),
-  Markup.callbackButton('3', '3'),
-  Markup.callbackButton('4', '4'),
-])
+const keyboard = [[ 
+Markup.callbackButton('1', 't1'),
+Markup.callbackButton('2', 't2'),
+Markup.callbackButton('3', 't3'),
+Markup.callbackButton('4', 't4'),
+Markup.callbackButton('5', 't5')],
+[
+  Markup.callbackButton('6', 't6'),
+  Markup.callbackButton('7', 't7'),
+  Markup.callbackButton('8', 't8'),
+  Markup.callbackButton('9', 't9'),
+  Markup.callbackButton('10', 't10')
+]
+ 
+  
+]
 
-const keyboard_for_impostor = Markup.inlineKeyboard([
-  Markup.callbackButton('1', '11'),
-  Markup.callbackButton('2', '22'),
-  Markup.callbackButton('3', '33'),
-  Markup.callbackButton('4', '44'),
-])
+let create_keyboard = (arr) => {
+ return Markup.inlineKeyboard(arr)
+}
 
 const settings = Markup.inlineKeyboard([
-  Markup.callbackButton('Кол-во заданий(до 5)', 'change_num_of_tasks'),
+  Markup.callbackButton('Кол-во заданий(до 10)', 'change_num_of_tasks'),
   Markup.callbackButton('Кол-во импостеров', 'change_num_of_impostors')
   // Markup.callbackButton('', '3'),
   // Markup.callbackButton('', '4'),
 ])
 
-const settings_tasks = Markup.inlineKeyboard([
-  Markup.callbackButton('1', 'task_1'),
-  Markup.callbackButton('2', 'task_2'),
-  Markup.callbackButton('3', 'task_3'),
-  Markup.callbackButton('4', 'task_4'),
-  Markup.callbackButton('5', 'task_5')
-])
+const settings_tasks = [[Markup.callbackButton('1', 'task_1'),
+Markup.callbackButton('2', 'task_2'),
+Markup.callbackButton('3', 'task_3'),  
+Markup.callbackButton('4', 'task_4'),
+Markup.callbackButton('5', 'task_5')],
+[
+Markup.callbackButton('6', 'task_6'),
+Markup.callbackButton('7', 'task_7'),
+Markup.callbackButton('8', 'task_8'),
+Markup.callbackButton('9', 'task_9'),
+Markup.callbackButton('10', 'task_10'),
+
+]]
+
 
 const settings_impostors = Markup.inlineKeyboard([
   Markup.callbackButton('1', 'impostor_1'),
@@ -42,7 +56,7 @@ const settings_impostors = Markup.inlineKeyboard([
 let tasks = {}
 let players = []
 let is_imposter = {}
-let num_of_tasks  = 4;
+let num_of_tasks  = 5;
 let num_of_impostors = 5
 
 let game_menu = () => {
@@ -116,7 +130,7 @@ bot.action('change_num_of_impostors', (ctx) => {
 
 
 bot.action('change_num_of_tasks', (ctx) => {
-  return ctx.reply('Выберите кол-во заданий', Extra.markup(settings_tasks))
+  return ctx.reply('Выберите кол-во заданий', Extra.markup(create_keyboard(settings_tasks)))
 })
 
 for (let i = 1; i<5; i++) {
@@ -130,7 +144,7 @@ for (let i = 1; i<5; i++) {
   
 }
 
-for (let i = 1; i<6; i++) { 
+for (let i = 1; i<11; i++) { 
   bot.action('task_'+i, (ctx) => {
     num_of_tasks = i
     return ctx.reply('Принято', Markup
@@ -190,10 +204,12 @@ bot.hears('📢 репорт', (ctx) => {
 
 let points = 0
 
-for (let i = 1; i<5; i++) { 
-  bot.action(''+i, (ctx) => {
-    console.log(players)
+for (let i = 1; i<11; i++) {
+  bot.action('t'+i, (ctx) => {
     let id = ctx.chat.id.toString()
+    if (!is_imposter[id]) {
+      console.log(players)
+    
     if (Object.keys(tasks).includes(id)) {
       if (!tasks[id].includes(''+i)) {
         tasks[id].push(''+i)
@@ -217,14 +233,34 @@ for (let i = 1; i<5; i++) {
       players.push(id)
     }
     return ctx.reply('Записано', game_menu())
-  })
+    }
+    
+  
+  }
+  
+  )
 }
 bot.hears('Заявить о сделанном задании', (ctx) => {
-  if (is_imposter[ctx.chat.id.toString()]) {
-    ctx.reply("Какое задание вы выполнили?",Extra.markup(keyboard_for_impostor))
-  } else {
-    ctx.reply("Какое задание вы выполнили?",Extra.markup(keyboard))
+  let keyboard2= []
+  for (let i = 0; i< keyboard.length; i++){
+    keyboard2.push(keyboard[i])
   }
+  console.log(keyboard2, keyboard)
+  console.log(num_of_tasks)
+  keyboard2 = keyboard2[0].concat(keyboard2[1])
+  console.log(keyboard2)
+  keyboard2 = keyboard2.splice(0, num_of_tasks)
+  console.log(keyboard2, keyboard)
+  let keyboard3 = []
+  if (keyboard2.length>7) {
+     keyboard3.push(keyboard2.slice(0,Math.trunc(keyboard2.length/2+1)))
+     keyboard3.push(keyboard2.slice(Math.trunc(keyboard2.length/2+1)))
+
+  } else {
+    keyboard3 = keyboard2
+  }
+    console.log(keyboard3, keyboard2.slice(0,Math.trunc(keyboard2.length/2+1)), keyboard2.slice(Math.trunc(keyboard2.length/2+1)))
+    ctx.reply("Какое задание вы выполнили?",Extra.markup(create_keyboard(keyboard3)))
   
 })
 
