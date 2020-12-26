@@ -38,6 +38,7 @@
 		let line1 = []
 		let line2 = []
 		for (let i = start_val; i <= btn_num; i+=step) {
+			console.log(i)
 			if (btn_num > 5) {
 				if (i > Math.trunc(btn_num / 2)) {
 					line2.push(Markup.callbackButton(i.toString(), label + i.toString()))
@@ -69,7 +70,6 @@
 		// Markup.callbackButton('', '3'),
 		// Markup.callbackButton('', '4'),
 	])
-	console.log(keyboard)
 	const settings_tasks = create_keyboard_list(10, 'task_')
 
 	const settings_delay = create_keyboard_list(10, 'delay_', step = 7, start_val = 15)
