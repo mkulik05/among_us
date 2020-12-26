@@ -233,6 +233,7 @@
 				console.log("write data")
 				data["last_sabotage"] = new Date()
 			} else {
+				console.log(data["last_sabotage"])
 				console.log(new Date() - data["last_sabotage"])
 				if (!( (new Date() - data["last_sabotage"]) /1000 > data["game_settings"]["sabotage_delay"])) {
 					return ctx.reply('С прошлого саботажа прошло недостаточно времени', game_menu())
