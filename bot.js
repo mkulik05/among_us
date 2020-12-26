@@ -188,7 +188,8 @@ bot.hears('Да, удалить все', (ctx) => {
             players: {},
             game_settings: {
                 num_of_tasks: 5,
-                num_of_impostors: 5
+				num_of_impostors: 2,
+				admin_id: ""
             }
         }
         return ctx.reply('Данные очищены', game_menu())
