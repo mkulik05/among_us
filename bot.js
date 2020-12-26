@@ -211,7 +211,7 @@ let delay = (time) => {
     });
 }
 
-bot.hears('Сделать саботаж', (ctx) => {
+bot.hears('Сделать саботаж', async (ctx) => {
     if (data["players"][ctx.chat.id.toString()]["is_impostor"]) {
         for (let i = 0; i < Object.keys(data["players"]).length; i++) {
             bot.telegram.sendMessage(Object.keys(data["players"])[i], "Саботаж!!!!!!", game_menu())
