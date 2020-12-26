@@ -33,11 +33,11 @@
 		}
 	});
 
-	let create_keyboard_list = (btn_num, label, step = 1, start_val= 1, vis = false) => {
+	let create_keyboard_list = (btn_num, label, step = 1, start_val= 1) => {
 		let res = []
 		let line1 = []
 		let line2 = []
-		for (let i = start_val; i < btn_num*step+start_val; i+=step) {
+		for (let i = start_val; i <= btn_num*step+start_val; i+=step) {
 			
 			if (btn_num > 5) {
 				if (i > Math.trunc(btn_num / 2)) {
@@ -72,8 +72,7 @@
 	])
 	const settings_tasks = create_keyboard_list(10, 'task_')
 
-	const settings_delay = create_keyboard_list(10, 'delay_', step = 7, start_val = 15, vis=true)
-	console.log(settings_delay)
+	const settings_delay = create_keyboard_list(12, 'delay_', step = 7, start_val = 15)
 	const settings_impostors = create_keyboard_list(4, 'impostor_')
 	let data = {
 		players: {},
