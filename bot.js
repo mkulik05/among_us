@@ -69,11 +69,11 @@
 		// Markup.callbackButton('', '3'),
 		// Markup.callbackButton('', '4'),
 	])
-
+	console.log(keyboard)
 	const settings_tasks = create_keyboard_list(10, 'task_')
 
-	const settings_delay = create_keyboard_list(12, 'delay_', step = 7, start_val = 15)
-
+	const settings_delay = create_keyboard_list(10, 'delay_', step = 7, start_val = 15)
+	console.log(settings_delay)
 	const settings_impostors = create_keyboard_list(4, 'impostor_')
 	let data = {
 		players: {},
@@ -236,8 +236,10 @@
 				console.log(data["last_sabotage"])
 				console.log(new Date() - data["last_sabotage"])
 				if (!( (new Date() - data["last_sabotage"]) /1000 > data["game_settings"]["sabotage_delay"])) {
-					data["last_sabotage"] = new Date()
+					
 					return ctx.reply('С прошлого саботажа прошло недостаточно времени', game_menu())
+				} else {
+					data["last_sabotage"] = new Date()
 				}
 			}
 			for (let i = 0; i < Object.keys(data["players"]).length; i++) {
