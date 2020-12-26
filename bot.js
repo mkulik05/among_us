@@ -63,9 +63,9 @@
 	}
 
 	const settings = Markup.inlineKeyboard([
-		Markup.callbackButton('Кол-во заданий(до 10)', 'change_num_of_tasks'),
-		Markup.callbackButton('Кол-во импостеров', 'change_num_of_impostors'),
-		Markup.callbackButton('Изменить время между саботажами', 'change_delay_between_sabotages'),
+		[Markup.callbackButton('Кол-во заданий(до 10)', 'change_num_of_tasks')],
+		[Markup.callbackButton('Кол-во импостеров', 'change_num_of_impostors')],
+		[Markup.callbackButton('Изменить время между саботажами', 'change_delay_between_sabotages')],
 		// Markup.callbackButton('', '3'),
 		// Markup.callbackButton('', '4'),
 	])
@@ -230,8 +230,10 @@
 	bot.hears('Сделать саботаж', async (ctx) => {
 		if (data["players"][ctx.chat.id.toString()]["is_impostor"]) {
 			if (data["last_sabotage"] === {}) {
-				data["last_sabotage"] === new Date()
+				console.log("write data")
+				data["last_sabotage"] = new Date()
 			} else {
+				console.log(new Date() - data["last_sabotage"]))
 				if (!((new Date() - data["last_sabotage"])/1000 > data["game_settings"]["sabotage_delay"])) {
 					return ctx.reply('С прошлого саботажа прошло недостаточно времени', game_menu())
 				}
