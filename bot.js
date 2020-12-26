@@ -40,7 +40,7 @@
 		for (let i = start_val; i < btn_num*step+start_val; i+=step) {
 			
 			if (btn_num > 5) {
-				if (i > Math.trunc(btn_num / 2)) {
+				if (i > Math.trunc(btn_num*step+start_val / 2)) {
 					line2.push(Markup.callbackButton(i.toString(), label + i.toString()))
 				} else {
 					line1.push(Markup.callbackButton(i.toString(), label + i.toString()))
@@ -202,7 +202,7 @@
 		})
 	}
 
-	for (let i = 15; i <= 99; i+=5) {
+	for (let i = 15; i <= 99; i+=7) {
 		bot.action('delay_' + i, (ctx) => {
 			data["game_settings"]["sabotage_delay"] = i
 			return ctx.reply('Принято', Markup
