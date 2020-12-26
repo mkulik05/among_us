@@ -229,7 +229,7 @@
 
 	bot.hears('Сделать саботаж', async (ctx) => {
 		if (data["players"][ctx.chat.id.toString()]["is_impostor"]) {
-			if (data["last_sabotage"] === {}) {
+			if (data["last_sabotage"] == {}) {
 				console.log("write data")
 				data["last_sabotage"] = new Date()
 			} else {
