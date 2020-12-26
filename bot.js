@@ -10,27 +10,27 @@ let from_arduino_404 = new Gpio(27, 'in', 'both');
 to_arduino.writeSync(0);
 
 from_arduino_200.watch((err, value) => {
-	console.log('200', value) //Watch for hardware interrupts on meetingButton GPIO, specify callback function
-	if (value) {
-		for (let i = 0; i < Object.keys(data["players"]).length; i++) {
-			bot.telegram.sendMessage(Object.keys(data["players"])[i], "Саботаж устранён!!")
-		}
-	}
+    console.log('200', value) //Watch for hardware interrupts on meetingButton GPIO, specify callback function
+    if (value) {
+        for (let i = 0; i < Object.keys(data["players"]).length; i++) {
+            bot.telegram.sendMessage(Object.keys(data["players"])[i], "Саботаж устранён!!")
+        }
+    }
 });
 from_arduino_404.watch((err, value) => {
-	console.log('400', value) //Watch for hardware interrupts on meetingButton GPIO, specify callback function
-	if (value) {
-		for (let i = 0; i < Object.keys(data["players"]).length; i++) {
-			bot.telegram.sendMessage(Object.keys(data["players"])[i], "Саботаж не был устранён, импостеры победили")
-		}
-	}
+    console.log('400', value) //Watch for hardware interrupts on meetingButton GPIO, specify callback function
+    if (value) {
+        for (let i = 0; i < Object.keys(data["players"]).length; i++) {
+            bot.telegram.sendMessage(Object.keys(data["players"])[i], "Саботаж не был устранён, импостеры победили")
+        }
+    }
 });
 meetingButton.watch((err, value) => { //Watch for hardware interrupts on meetingButton GPIO, specify callback function
-	if (value) {
-		for (let i = 0; i < Object.keys(data["players"]).length; i++) {
-			bot.telegram.sendMessage(Object.keys(data["players"])[i], "Созвано экстренное собрание!!!")
-		}
-	}
+    if (value) {
+        for (let i = 0; i < Object.keys(data["players"]).length; i++) {
+            bot.telegram.sendMessage(Object.keys(data["players"])[i], "Созвано экстренное собрание!!!")
+        }
+    }
 });
 
 let create_keyboard_list = (btn_num, label) => {
@@ -79,8 +79,8 @@ let data = {
         num_of_tasks: 5,
         num_of_impostors: 2,
         admin_id: ""
-	},
-	points: 0
+    },
+    points: 0
 }
 // let tasks = {}
 // let players = []
@@ -204,21 +204,21 @@ bot.hears('Настройки', (ctx) => {
 bot.help((ctx) => ctx.reply('Help message'))
 
 let delay = (time) => {
-	return new Promise(resolve => {
-		setTimeout(() => {
-			resolve(2);
-		}, time);
-	});
+    return new Promise(resolve => {
+        setTimeout(() => {
+            resolve(2);
+        }, time);
+    });
 }
 
 bot.hears('Сделать саботаж', (ctx) => {
     if (data["players"][ctx.chat.id.toString()]["is_impostor"]) {
         for (let i = 0; i < Object.keys(data["players"]).length; i++) {
             bot.telegram.sendMessage(Object.keys(data["players"])[i], "Саботаж!!!!!!", game_menu())
-		}
-		to_arduino.writeSync(1);
-		await delay(1000)
-		to_arduino.writeSync(0);
+        }
+        to_arduino.writeSync(1);
+        await delay(1000)
+        to_arduino.writeSync(0);
     } else {
         return ctx.reply('Ты не импостер!!!', game_menu())
     }
@@ -229,10 +229,10 @@ bot.hears('Да, удалить все', (ctx) => {
             players: {},
             game_settings: {
                 num_of_tasks: 5,
-				num_of_impostors: 2,
-				admin_id: ""
-			},
-			points: 0
+                num_of_impostors: 2,
+                admin_id: ""
+            },
+            points: 0
         }
         return ctx.reply('Данные очищены', game_menu())
     } else {
@@ -374,8 +374,8 @@ bot.hears('Заявить о сделанном задании', (ctx) => {
 
 bot.launch()
 let unexportOnClose = () => {
-	to_arduino.writeSync(0);
-	to_arduino.unexport();
-	meetingButton.unexport();
+    to_arduino.writeSync(0);
+    to_arduino.unexport();
+    meetingButton.unexport();
 };
 process.on('SIGINT', unexportOnClose);
