@@ -227,7 +227,7 @@
 		});
 	}
 
-	bot.hears('Сделать саботаж', (ctx) => {
+	bot.hears('Сделать саботаж', async (ctx) => {
 		if (data["players"][ctx.chat.id.toString()]["is_impostor"]) {
 			if (data["last_sabotage"] === {}) {
 				data["last_sabotage"] === new Date()
