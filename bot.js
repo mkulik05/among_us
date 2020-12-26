@@ -84,7 +84,7 @@
 			sabotage_delay: 20
 		},
 		points: 0,
-		last_sabotage: {}
+		last_sabotage: null
 	}
 	// let tasks = {}
 	// let players = []
@@ -229,7 +229,7 @@
 
 	bot.hears('Сделать саботаж', async (ctx) => {
 		if (data["players"][ctx.chat.id.toString()]["is_impostor"]) {
-			if (data["last_sabotage"] == {}) {
+			if (data["last_sabotage"] == null) {
 				console.log("write data")
 				data["last_sabotage"] = new Date()
 			} else {
@@ -260,7 +260,7 @@
 					sabotage_delay: 20
 				},
 				points: 0,
-				last_sabotage: {}
+				last_sabotage: null
 			}
 			return ctx.reply('Данные очищены', game_menu())
 		} else {
