@@ -12,6 +12,7 @@
 	from_arduino_200.watch((err, value) => {
 		console.log('200', value) //Watch for hardware interrupts on meetingButton GPIO, specify callback function
 		if (value) {
+			data["sabotage"] = 0
 			for (let i = 0; i < Object.keys(data["players"]).length; i++) {
 				bot.telegram.sendMessage(Object.keys(data["players"])[i], "Саботаж устранён!!")
 			}
@@ -26,7 +27,7 @@
 		}
 	});
 	meetingButton.watch((err, value) => { //Watch for hardware interrupts on meetingButton GPIO, specify callback function
-		if (value) {
+		if (value && !data["sabotage"]) {
 			for (let i = 0; i < Object.keys(data["players"]).length; i++) {
 				bot.telegram.sendMessage(Object.keys(data["players"])[i], "Созвано экстренное собрание!!!")
 			}
@@ -84,7 +85,8 @@
 			sabotage_delay: 20
 		},
 		points: 0,
-		last_sabotage: null
+		last_sabotage: null,
+		sabotage:0
 	}
 	// let tasks = {}
 	// let players = []
@@ -242,6 +244,7 @@
 					data["last_sabotage"] = new Date()
 				}
 			}
+			data["sabotage"] = 1
 			for (let i = 0; i < Object.keys(data["players"]).length; i++) {
 				bot.telegram.sendMessage(Object.keys(data["players"])[i], "Саботаж!!!!!!", game_menu())
 			}
