@@ -21,6 +21,7 @@
 	from_arduino_404.watch((err, value) => {
 		console.log('400', value) //Watch for hardware interrupts on meetingButton GPIO, specify callback function
 		if (value) {
+			data["sabotage"] = 0
 			for (let i = 0; i < Object.keys(data["players"]).length; i++) {
 				bot.telegram.sendMessage(Object.keys(data["players"])[i], "Саботаж не был устранён, импостеры победили")
 			}
