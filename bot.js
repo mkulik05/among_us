@@ -33,11 +33,11 @@ meetingButton.watch((err, value) => { //Watch for hardware interrupts on meeting
     }
 });
 
-let create_keyboard_list = (btn_num, label) => {
+let create_keyboard_list = (btn_num, label, step = 1, start_val= 1) => {
     let res = []
     let line1 = []
     let line2 = []
-    for (let i = 1; i <= btn_num; i++) {
+    for (let i = start_val; i <= btn_num; i+=step) {
         if (btn_num > 5) {
             if (i > Math.trunc(btn_num / 2)) {
                 line2.push(Markup.callbackButton(i.toString(), label + i.toString()))
@@ -64,13 +64,15 @@ let create_keyboard = (arr) => {
 
 const settings = Markup.inlineKeyboard([
     Markup.callbackButton('Кол-во заданий(до 10)', 'change_num_of_tasks'),
-    Markup.callbackButton('Кол-во импостеров', 'change_num_of_impostors')
+	Markup.callbackButton('Кол-во импостеров', 'change_num_of_impostors'),
+	Markup.callbackButton('Изменить время между саботажами', 'change_delay_between_sabotages'),
     // Markup.callbackButton('', '3'),
     // Markup.callbackButton('', '4'),
 ])
 
 const settings_tasks = create_keyboard_list(10, 'task_')
 
+const settings_delay = create_keyboard_list(12, 'delay_', step = 7, start_val = 15)
 
 const settings_impostors = create_keyboard_list(4, 'impostor_')
 let data = {
@@ -78,9 +80,11 @@ let data = {
     game_settings: {
         num_of_tasks: 5,
         num_of_impostors: 2,
-        admin_id: ""
+		admin_id: "",
+		sabotage_delay: 20
     },
-    points: 0
+	points: 0,
+	last_sabotage = {}
 }
 // let tasks = {}
 // let players = []
@@ -170,6 +174,9 @@ bot.action('change_num_of_impostors', (ctx) => {
     return ctx.reply('Выберите кол-во импостеров', Extra.markup(create_keyboard(settings_impostors)))
 })
 
+bot.action('change_delay_between_sabotages', (ctx) => {
+    return ctx.reply('Какое время установить(в секундах)', Extra.markup(create_keyboard(settings_delay)))
+})
 
 bot.action('change_num_of_tasks', (ctx) => {
     return ctx.reply('Выберите кол-во заданий', Extra.markup(create_keyboard(settings_tasks)))
@@ -196,6 +203,15 @@ for (let i = 1; i < 11; i++) {
     })
 }
 
+for (let i = 15; i <= 99; i+=5) {
+    bot.action('delay_' + i, (ctx) => {
+        data["game_settings"]["sabotage_delay"] = i
+        return ctx.reply('Принято', Markup
+            .keyboard([
+                ['Настройки', 'Начать игру'],
+            ]).oneTime().resize().extra())
+    })
+}
 
 bot.hears('Настройки', (ctx) => {
     return ctx.reply('Хорошо', Extra.markup(settings))
@@ -211,8 +227,15 @@ let delay = (time) => {
     });
 }
 
-bot.hears('Сделать саботаж', async (ctx) => {
+bot.hears('Сделать саботаж', (ctx) => {
     if (data["players"][ctx.chat.id.toString()]["is_impostor"]) {
+		if (data["last_sabotage"] === {}) {
+			data["last_sabotage"] === new Date()
+		} else {
+			if (!((new Date() - data["last_sabotage"])/1000 > data["game_settings"]["sabotage_delay"])) {
+				return ctx.reply('С прошлого саботажа прошло недостаточно времени', game_menu())
+			}
+		}
         for (let i = 0; i < Object.keys(data["players"]).length; i++) {
             bot.telegram.sendMessage(Object.keys(data["players"])[i], "Саботаж!!!!!!", game_menu())
         }
@@ -225,15 +248,17 @@ bot.hears('Сделать саботаж', async (ctx) => {
 })
 bot.hears('Да, удалить все', (ctx) => {
     if (ctx.chat.id.toString() === data["game_settings"]["admin_id"]) {
-        data = {
-            players: {},
-            game_settings: {
-                num_of_tasks: 5,
-                num_of_impostors: 2,
-                admin_id: ""
-            },
-            points: 0
-        }
+		let data = {
+			players: {},
+			game_settings: {
+				num_of_tasks: 5,
+				num_of_impostors: 2,
+				admin_id: "",
+				sabotage_delay: 20
+			},
+			points: 0,
+			last_sabotage = {}
+		}
         return ctx.reply('Данные очищены', game_menu())
     } else {
         return ctx.reply('Действие запрещено', game_menu())
