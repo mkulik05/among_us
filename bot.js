@@ -51,7 +51,7 @@
 			} else {
 				res.push(Markup.callbackButton(i.toString(), label + i.toString()))
 			}
-		}
+		} 
 		if (btn_num > 5) {
 			res.push(line1)
 			res.push(line2)
