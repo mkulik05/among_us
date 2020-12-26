@@ -258,7 +258,7 @@
 	})
 	bot.hears('Да, удалить все', (ctx) => {
 		if (ctx.chat.id.toString() === data["game_settings"]["admin_id"]) {
-			let data = {
+			data = {
 				players: {},
 				game_settings: {
 					num_of_tasks: 5,
@@ -267,7 +267,8 @@
 					sabotage_delay: 20
 				},
 				points: 0,
-				last_sabotage: null
+				last_sabotage: null,
+				sabotage:0
 			}
 			return ctx.reply('Данные очищены', game_menu())
 		} else {
