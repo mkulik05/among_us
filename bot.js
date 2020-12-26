@@ -257,7 +257,7 @@
 					sabotage_delay: 20
 				},
 				points: 0,
-				last_sabotage = {}
+				last_sabotage: {}
 			}
 			return ctx.reply('Данные очищены', game_menu())
 		} else {
