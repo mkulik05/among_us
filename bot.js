@@ -2,23 +2,30 @@ const Telegraf = require('telegraf')
 const Extra = require('telegraf/extra')
 const Markup = require('telegraf/markup')
 const bot = new Telegraf("1448775683:AAHYrTikXlvfJfMyvAkc34MCd9007-wuC8Q")
+let create_keyboard_list = (btn_num, label) => {
+	let res = []
+	let line1 = []
+	let line2 = []
+	for (let i = 1; i<=btn_num;i++) {
+		if (btn_num > 5) {
+			if (i>Math.trunc(btn_num/2)) {
+				line2.push(Markup.callbackButton(i.toString(), label+i.toString()))
+			} else {
+				line1.push(Markup.callbackButton(i.toString(), label+i.toString()))
+			}
+		} else {
+			res.push(Markup.callbackButton(i.toString(), label+i.toString()))
+		}
+	}
+	if (btn_num > 5) {
+		res.push(line1)
+		res.push(line2)
+	}
+	
+	return res
+}
 
-const keyboard = [[ 
-Markup.callbackButton('1', 't1'),
-Markup.callbackButton('2', 't2'),
-Markup.callbackButton('3', 't3'),
-Markup.callbackButton('4', 't4'),
-Markup.callbackButton('5', 't5')],
-[
-  Markup.callbackButton('6', 't6'),
-  Markup.callbackButton('7', 't7'),
-  Markup.callbackButton('8', 't8'),
-  Markup.callbackButton('9', 't9'),
-  Markup.callbackButton('10', 't10')
-]
- 
-  
-]
+const keyboard = create_keyboard_list(10, 't')
 
 let create_keyboard = (arr) => {
  return Markup.inlineKeyboard(arr)
@@ -31,28 +38,10 @@ const settings = Markup.inlineKeyboard([
   // Markup.callbackButton('', '4'),
 ])
 
-const settings_tasks = [[Markup.callbackButton('1', 'task_1'),
-Markup.callbackButton('2', 'task_2'),
-Markup.callbackButton('3', 'task_3'),  
-Markup.callbackButton('4', 'task_4'),
-Markup.callbackButton('5', 'task_5')],
-[
-Markup.callbackButton('6', 'task_6'),
-Markup.callbackButton('7', 'task_7'),
-Markup.callbackButton('8', 'task_8'),
-Markup.callbackButton('9', 'task_9'),
-Markup.callbackButton('10', 'task_10'),
-
-]]
+const settings_tasks = create_keyboard_list(10, 'task_')
 
 
-const settings_impostors = Markup.inlineKeyboard([
-  Markup.callbackButton('1', 'impostor_1'),
-  Markup.callbackButton('2', 'impostor_2'),
-  Markup.callbackButton('3', 'impostor_3'),
-  Markup.callbackButton('4', 'impostor_4'),
-])
-
+const settings_impostors = create_keyboard_list(4, 'impostor_')
 let tasks = {}
 let players = []
 let is_imposter = {}
@@ -132,7 +121,7 @@ bot.hears('Начать игру', (ctx) => {
 })
 
 bot.action('change_num_of_impostors', (ctx) => {
-  return ctx.reply('Выберите кол-во импостеров', Extra.markup(settings_impostors))
+  return ctx.reply('Выберите кол-во импостеров', Extra.markup(create_keyboard(settings_impostors)))
 })
 
 
@@ -293,35 +282,43 @@ let  shuffle = (array) => {
 }
 
 bot.hears('Заявить о сделанном задании', (ctx) => {
+  id = ctx.chat.id.toString()
   let keyboard2= []
   for (let i = 0; i< keyboard.length; i++){
     keyboard2.push(keyboard[i])
   }
-  console.log(keyboard2, keyboard)
-  console.log(num_of_tasks)
   keyboard2 = keyboard2[0].concat(keyboard2[1])
-  id = ctx.chat.id.toString()
-  console.log(id, Object.keys(players_tasks), Object.keys(players_tasks).includes(id), players_tasks)
+
+  
+
   if (Object.keys(players_tasks).includes(id)) {
-    console.log(players_tasks)
+
     keys = Object.keys(players_tasks).includes(id)
     // let keyboard_copy = {}
     // for (let key_i = 0; key_i<keys.length;key_i++) {
     //   keyboard_copy[keys[i]] = players_tasks[keys[i]]
     // }
-    keyboard2 = players_tasks[id]
+	keyboard2 = players_tasks[id]
+	console.log(keyboard2)
+	keyboard2 = keyboard2.filter(word => {
+		console.log(word["text"], tasks[id])
+		return !tasks[id].includes(word["text"])
+  });
+  
+	if (keyboard2.length == 0) {
+	  ctx.reply("Вы выполнили все задания")
+	  return;
+	}
     // console.log(keyboard_copy)
   } else {
     keyboard2 = shuffle(keyboard2)
-    console.log(players_tasks, '--')
+	keyboard2 = keyboard2.slice(0, num_of_tasks)
     players_tasks[id] = keyboard2
-    console.log(players_tasks, '---')
+
   }
-  console.log('\n?',players_tasks, "??")
-  keyboard2 = keyboard2.slice(0, num_of_tasks)
-  console.log(players_tasks, "?????????")
+  
   let keyboard3 = []
-  if (keyboard2.length>7) {
+  if (keyboard2.length>5) {
      keyboard3.push(keyboard2.slice(0,Math.trunc(keyboard2.length/2+1)))
      keyboard3.push(keyboard2.slice(Math.trunc(keyboard2.length/2+1)))
 
