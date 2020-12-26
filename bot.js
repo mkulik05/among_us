@@ -37,10 +37,11 @@
 		let res = []
 		let line1 = []
 		let line2 = []
+		let el = 1
 		for (let i = start_val; i < btn_num*step+start_val; i+=step) {
 			
-			if (btn_num > 5) {
-				if (i > Math.trunc(btn_num*step+start_val / 2)) {
+			if (el > 5) {
+				if (el > Math.trunc(btn_num / 2)) {
 					line2.push(Markup.callbackButton(i.toString(), label + i.toString()))
 				} else {
 					line1.push(Markup.callbackButton(i.toString(), label + i.toString()))
@@ -48,6 +49,7 @@
 			} else {
 				res.push(Markup.callbackButton(i.toString(), label + i.toString()))
 			}
+			el += 1
 		} 
 		if (btn_num > 5) {
 			res.push(line1)
