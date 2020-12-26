@@ -37,7 +37,7 @@
 		let res = []
 		let line1 = []
 		let line2 = []
-		for (let i = start_val; i <= btn_num*step+start_val; i+=step) {
+		for (let i = start_val; i < btn_num*step+start_val; i+=step) {
 			
 			if (btn_num > 5) {
 				if (i > Math.trunc(btn_num / 2)) {
