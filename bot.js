@@ -55,7 +55,6 @@
 			res.push(line1)
 			res.push(line2)
 		}
-		console.log(res)
 		return res
 	}
 
