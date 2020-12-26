@@ -40,7 +40,7 @@
 		let el = 0
 		for (let i = start_val; i < btn_num*step+start_val; i+=step) {
 			
-			if (el > 5) {
+			if (btn_num > 5) {
 				if (el > Math.trunc(btn_num / 2)) {
 					line2.push(Markup.callbackButton(i.toString(), label + i.toString()))
 				} else {
