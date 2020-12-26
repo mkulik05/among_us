@@ -37,7 +37,7 @@
 		let res = []
 		let line1 = []
 		let line2 = []
-		let el = 1
+		let el = 0
 		for (let i = start_val; i < btn_num*step+start_val; i+=step) {
 			
 			if (el > 5) {
@@ -55,7 +55,7 @@
 			res.push(line1)
 			res.push(line2)
 		}
-
+		console.log(res)
 		return res
 	}
 
