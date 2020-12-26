@@ -2,6 +2,37 @@ const Telegraf = require('telegraf')
 const Extra = require('telegraf/extra')
 const Markup = require('telegraf/markup')
 const bot = new Telegraf("1448775683:AAHYrTikXlvfJfMyvAkc34MCd9007-wuC8Q")
+let Gpio = require('onoff').Gpio;
+let to_arduino = new Gpio(4, 'out');
+let meetingButton = new Gpio(15, 'in', 'both');
+let from_arduino_200 = new Gpio(17, 'in', 'both');
+let from_arduino_404 = new Gpio(27, 'in', 'both');
+to_arduino.writeSync(0);
+
+from_arduino_200.watch((err, value) => {
+	console.log('200', value) //Watch for hardware interrupts on meetingButton GPIO, specify callback function
+	if (value) {
+		for (let i = 0; i < Object.keys(data["players"]).length; i++) {
+			bot.telegram.sendMessage(Object.keys(data["players"])[i], "Саботаж устранён!!")
+		}
+	}
+});
+from_arduino_404.watch((err, value) => {
+	console.log('400', value) //Watch for hardware interrupts on meetingButton GPIO, specify callback function
+	if (value) {
+		for (let i = 0; i < Object.keys(data["players"]).length; i++) {
+			bot.telegram.sendMessage(Object.keys(data["players"])[i], "Саботаж не был устранён, импостеры победили")
+		}
+	}
+});
+meetingButton.watch((err, value) => { //Watch for hardware interrupts on meetingButton GPIO, specify callback function
+	if (value) {
+		for (let i = 0; i < Object.keys(data["players"]).length; i++) {
+			bot.telegram.sendMessage(Object.keys(data["players"])[i], "Созвано экстренное собрание!!!")
+		}
+	}
+});
+
 let create_keyboard_list = (btn_num, label) => {
     let res = []
     let line1 = []
@@ -48,7 +79,8 @@ let data = {
         num_of_tasks: 5,
         num_of_impostors: 2,
         admin_id: ""
-    }
+	},
+	points: 0
 }
 // let tasks = {}
 // let players = []
@@ -171,13 +203,22 @@ bot.hears('Настройки', (ctx) => {
 
 bot.help((ctx) => ctx.reply('Help message'))
 
-
+let delay = (time) => {
+	return new Promise(resolve => {
+		setTimeout(() => {
+			resolve(2);
+		}, time);
+	});
+}
 
 bot.hears('Сделать саботаж', (ctx) => {
     if (data["players"][ctx.chat.id.toString()]["is_impostor"]) {
         for (let i = 0; i < Object.keys(data["players"]).length; i++) {
             bot.telegram.sendMessage(Object.keys(data["players"])[i], "Саботаж!!!!!!", game_menu())
-        }
+		}
+		to_arduino.writeSync(1);
+		await delay(1000)
+		to_arduino.writeSync(0);
     } else {
         return ctx.reply('Ты не импостер!!!', game_menu())
     }
@@ -190,7 +231,8 @@ bot.hears('Да, удалить все', (ctx) => {
                 num_of_tasks: 5,
 				num_of_impostors: 2,
 				admin_id: ""
-            }
+			},
+			points: 0
         }
         return ctx.reply('Данные очищены', game_menu())
     } else {
@@ -233,7 +275,6 @@ bot.hears('📢 репорт', (ctx) => {
     // ]).oneTime().resize().extra()
 })
 
-let points = 0
 
 for (let i = 1; i < 11; i++) {
     bot.action('t' + i, (ctx) => {
@@ -244,8 +285,8 @@ for (let i = 1; i < 11; i++) {
 
                     if (!data["players"][id]["tasks"].includes('' + i)) {
                         data["players"][id]["tasks"].push('' + i)
-                        points += 1
-                        if (points >= data["game_settings"]["num_of_tasks"] * (Object.keys(data["players"]).length - data["game_settings"]["num_of_impostors"])) {
+                        data["points"] += 1
+                        if (data["points"] >= data["game_settings"]["num_of_tasks"] * (Object.keys(data["players"]).length - data["game_settings"]["num_of_impostors"])) {
                             for (let i = 0; i < Object.keys(data["players"]).length; i++) {
                                 bot.telegram.sendMessage(Object.keys(data["players"])[i], "Все задания выполнены!!! Мирные победили", Markup
                                     .keyboard([
@@ -259,7 +300,7 @@ for (let i = 1; i < 11; i++) {
                         return ctx.reply('Вы уже выполнили это задание!!!', game_menu())
                     }
                 } else {
-                    points += 1
+                    data["points"] += 1
                     //console.log(points, data)
                     data["players"][id]["tasks"] = ['' + i]
                 }
@@ -332,3 +373,9 @@ bot.hears('Заявить о сделанном задании', (ctx) => {
 })
 
 bot.launch()
+let unexportOnClose = () => {
+	to_arduino.writeSync(0);
+	to_arduino.unexport();
+	meetingButton.unexport();
+};
+process.on('SIGINT', unexportOnClose);
