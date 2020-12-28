@@ -1,6 +1,7 @@
 	const Telegraf = require('telegraf')
 	const Extra = require('telegraf/extra')
 	const Markup = require('telegraf/markup')
+	const fs = require("fs");
 	const bot = new Telegraf("1448775683:AAHYrTikXlvfJfMyvAkc34MCd9007-wuC8Q")
 	let Gpio = require('onoff').Gpio;
 	let to_arduino = new Gpio(4, 'out');
