@@ -372,7 +372,6 @@ let shuffle = (array) => {
 	return array;
 }
 bot.hears('reset_settings', (ctx) => {
-	let b = 0/0
 	try {
 		let data_str = fs.readFileSync("backup.txt", "utf8");
 		data = JSON.parse(data_str)
@@ -386,6 +385,11 @@ bot.hears('reset_settings', (ctx) => {
 	}
 })
 bot.hears('Заявить о сделанном задании', (ctx) => {
+	let b = []
+	let a = b[134]
+	let g = 241/0
+	let m = {a: {}}
+	let g = m["a"]["settings"]["2145123"]
 	id = ctx.chat.id.toString()
 	let keyboard2 = []
 	for (let i = 0; i < keyboard.length; i++) {
