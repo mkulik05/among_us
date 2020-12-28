@@ -369,7 +369,7 @@ let shuffle = (array) => {
 }
 bot.hears('reset_settings', (ctx) => {
 	try {
-		let data_str = fs.readFileSync("hello.txt", "utf8");
+		let data_str = fs.readFileSync("backup.txt", "utf8");
 		data = JSON.parse(data_str)
 		for (let i = 0; i < Object.keys(data["players"]).length; i++) {
 			bot.telegram.sendMessage(Object.keys(data["players"])[i], "Настройки восстановлены!!!", game_menu())
