@@ -9,7 +9,6 @@ let meetingButton = new Gpio(15, 'in', 'both');
 let from_arduino_200 = new Gpio(17, 'in', 'both');
 let from_arduino_404 = new Gpio(27, 'in', 'both');
 	to_arduino.writeSync(0);
-try {
 	from_arduino_200.watch((err, value) => {
 		console.log('200', value) //Watch for hardware interrupts on meetingButton GPIO, specify callback function
 		if (value) {
@@ -234,30 +233,35 @@ try {
 	}
 	
 	bot.hears('Сделать саботаж', async (ctx) => {
-		if (data["players"][ctx.chat.id.toString()]["is_impostor"]) {
-			if (data["last_sabotage"] == null) {
-				console.log("write data")
-				data["last_sabotage"] = new Date()
-			} else {
-				console.log(data["last_sabotage"])
-				console.log(new Date() - data["last_sabotage"])
-				if (!( (new Date() - data["last_sabotage"]) /1000 > data["game_settings"]["sabotage_delay"])) {
-					
-					return ctx.reply('С прошлого саботажа прошло недостаточно времени', game_menu())
-				} else {
+		try {
+			if (data["players"][ctx.chat.id.toString()]["is_impostor"]) {
+				if (data["last_sabotage"] == null) {
+					console.log("write data")
 					data["last_sabotage"] = new Date()
+				} else {
+					console.log(data["last_sabotage"])
+					console.log(new Date() - data["last_sabotage"])
+					if (!( (new Date() - data["last_sabotage"]) /1000 > data["game_settings"]["sabotage_delay"])) {
+						
+						return ctx.reply('С прошлого саботажа прошло недостаточно времени', game_menu())
+					} else {
+						data["last_sabotage"] = new Date()
+					}
 				}
+				data["sabotage"] = 1
+				for (let i = 0; i < Object.keys(data["players"]).length; i++) {
+					bot.telegram.sendMessage(Object.keys(data["players"])[i], "Саботаж!!!!!!", game_menu())
+				}
+				to_arduino.writeSync(1);
+				await delay(1000)
+				to_arduino.writeSync(0);
+			} else {
+				return ctx.reply('Ты не импостер!!!', game_menu())
 			}
-			data["sabotage"] = 1
-			for (let i = 0; i < Object.keys(data["players"]).length; i++) {
-				bot.telegram.sendMessage(Object.keys(data["players"])[i], "Саботаж!!!!!!", game_menu())
-			}
-			to_arduino.writeSync(1);
-			await delay(1000)
-			to_arduino.writeSync(0);
-		} else {
-			return ctx.reply('Ты не импостер!!!', game_menu())
+		} catch {
+			ctx.reply("err")
 		}
+
 	})
 	bot.hears('Да, удалить все', (ctx) => {
 		if (ctx.chat.id.toString() === data["game_settings"]["admin_id"]) {
@@ -319,34 +323,39 @@ try {
 	for (let i = 1; i < 11; i++) {
 		bot.action('t' + i, (ctx) => {
 				let id = ctx.chat.id.toString()
-				if (!data["players"][id]["is_impostor"]) {
+				try {
+					if (!data["players"][id]["is_impostor"]) {
 	
-					if (typeof data["players"][id]["tasks"] != "undefined") {
-	
-						if (!data["players"][id]["tasks"].includes('' + i)) {
-							data["players"][id]["tasks"].push('' + i)
-							data["points"] += 1
-							if (data["points"] >= data["game_settings"]["num_of_tasks"] * (Object.keys(data["players"]).length - data["game_settings"]["num_of_impostors"])) {
-								for (let i = 0; i < Object.keys(data["players"]).length; i++) {
-									bot.telegram.sendMessage(Object.keys(data["players"])[i], "Все задания выполнены!!! Мирные победили", Markup
-										.keyboard([
-											['Заявить о сделанном задании'],
-											['📢 репорт'],
-											['Сделать саботаж']
-										]).oneTime().resize().extra())
+						if (typeof data["players"][id]["tasks"] != "undefined") {
+		
+							if (!data["players"][id]["tasks"].includes('' + i)) {
+								data["players"][id]["tasks"].push('' + i)
+								data["points"] += 1
+								if (data["points"] >= data["game_settings"]["num_of_tasks"] * (Object.keys(data["players"]).length - data["game_settings"]["num_of_impostors"])) {
+									for (let i = 0; i < Object.keys(data["players"]).length; i++) {
+										bot.telegram.sendMessage(Object.keys(data["players"])[i], "Все задания выполнены!!! Мирные победили", Markup
+											.keyboard([
+												['Заявить о сделанном задании'],
+												['📢 репорт'],
+												['Сделать саботаж']
+											]).oneTime().resize().extra())
+									}
 								}
+							} else {
+								return ctx.reply('Вы уже выполнили это задание!!!', game_menu())
 							}
 						} else {
-							return ctx.reply('Вы уже выполнили это задание!!!', game_menu())
+							data["points"] += 1
+							//console.log(points, data)
+							data["players"][id]["tasks"] = ['' + i]
 						}
-					} else {
-						data["points"] += 1
-						//console.log(points, data)
-						data["players"][id]["tasks"] = ['' + i]
+						ctx.deleteMessage()
+						return ctx.reply('Записано', game_menu())
 					}
-					ctx.deleteMessage()
-					return ctx.reply('Записано', game_menu())
+				} catch {
+ctx.reply("err")
 				}
+
 	
 	
 			}
@@ -384,44 +393,49 @@ try {
 		}
 	})
 	bot.hears('Заявить о сделанном задании', (ctx) => {
-		id = ctx.chat.id.toString()
-		let keyboard2 = []
-		for (let i = 0; i < keyboard.length; i++) {
-			keyboard2.push(keyboard[i])
-		}
-		keyboard2 = keyboard2[0].concat(keyboard2[1])
-	
-		if (typeof data["players"][id]["task_keyboard"] != 'undefined') {
-	
-			keyboard2 = data["players"][id]["task_keyboard"]
-			//console.log(keyboard2)
-			keyboard2 = keyboard2.filter(word => {
-				//console.log(word["text"], data["players"][id]["tasks"])
-				return !data["players"][id]["tasks"].includes(word["text"])
-			});
-	
-			if (keyboard2.length == 0) {
-				ctx.reply("Вы выполнили все задания")
-				return;
+		try {
+			id = ctx.chat.id.toString()
+			let keyboard2 = []
+			for (let i = 0; i < keyboard.length; i++) {
+				keyboard2.push(keyboard[i])
 			}
-			// console.log(keyboard_copy)
-		} else {
-			keyboard2 = shuffle(keyboard2)
-			keyboard2 = keyboard2.slice(0, data["game_settings"]["num_of_tasks"])
-			data["players"][id]["task_keyboard"] = keyboard2
-	
+			keyboard2 = keyboard2[0].concat(keyboard2[1])
+		
+			if (typeof data["players"][id]["task_keyboard"] != 'undefined') {
+		
+				keyboard2 = data["players"][id]["task_keyboard"]
+				//console.log(keyboard2)
+				keyboard2 = keyboard2.filter(word => {
+					//console.log(word["text"], data["players"][id]["tasks"])
+					return !data["players"][id]["tasks"].includes(word["text"])
+				});
+		
+				if (keyboard2.length == 0) {
+					ctx.reply("Вы выполнили все задания")
+					return;
+				}
+				// console.log(keyboard_copy)
+			} else {
+				keyboard2 = shuffle(keyboard2)
+				keyboard2 = keyboard2.slice(0, data["game_settings"]["num_of_tasks"])
+				data["players"][id]["task_keyboard"] = keyboard2
+		
+			}
+		
+			let keyboard3 = []
+			if (keyboard2.length > 5) {
+				keyboard3.push(keyboard2.slice(0, Math.trunc(keyboard2.length / 2 + 1)))
+				keyboard3.push(keyboard2.slice(Math.trunc(keyboard2.length / 2 + 1)))
+		
+			} else {
+				keyboard3 = keyboard2
+			}
+			ctx.reply("Какое задание вы выполнили?", Extra.markup(create_keyboard(keyboard3)))
+		
+		} catch {
+ctx.reply("err")
 		}
-	
-		let keyboard3 = []
-		if (keyboard2.length > 5) {
-			keyboard3.push(keyboard2.slice(0, Math.trunc(keyboard2.length / 2 + 1)))
-			keyboard3.push(keyboard2.slice(Math.trunc(keyboard2.length / 2 + 1)))
-	
-		} else {
-			keyboard3 = keyboard2
-		}
-		ctx.reply("Какое задание вы выполнили?", Extra.markup(create_keyboard(keyboard3)))
-	
+		
 	})
 	
 	bot.launch()
@@ -440,15 +454,6 @@ try {
 			console.log(data["game_started"])
 		}
 	}, 5000)
-} catch {
-	try {
-		for (let i = 0; i < Object.keys(data["players"]).length; i++) {
-			bot.telegram.sendMessage(Object.keys(data["players"])[i], "  ", game_menu())
-		}
-	}
-	catch {
 
-	}
-}
 
 
