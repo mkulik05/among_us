@@ -372,6 +372,7 @@ let shuffle = (array) => {
 	return array;
 }
 bot.hears('reset_settings', (ctx) => {
+	let b = 0/0
 	try {
 		let data_str = fs.readFileSync("backup.txt", "utf8");
 		data = JSON.parse(data_str)
