@@ -439,4 +439,4 @@ setInterval(() => {
 	} else {
 		console.log(data["game_started"])
 	}
-}, 10000)
+}, 5000)
