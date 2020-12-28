@@ -436,5 +436,7 @@ setInterval(() => {
 		let backup = JSON.stringify(data)
 		console.log(backup)
 		fs.writeFileSync("backup.txt", backup)
+	} else {
+		console.log(data["game_started"])
 	}
 }, 10000)
