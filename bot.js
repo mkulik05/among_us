@@ -8,7 +8,6 @@ let to_arduino = new Gpio(4, 'out');
 let meetingButton = new Gpio(15, 'in', 'both');
 let from_arduino_200 = new Gpio(17, 'in', 'both');
 let from_arduino_404 = new Gpio(27, 'in', 'both');
-try {
 	to_arduino.writeSync(0);
 
 from_arduino_200.watch((err, value) => {
@@ -385,11 +384,6 @@ bot.hears('reset_settings', (ctx) => {
 	}
 })
 bot.hears('Заявить о сделанном задании', (ctx) => {
-	let b = []
-	let a = b[134]
-	let g = 241/0
-	let m = {a: {}}
-	let dddd = m["a"]["settings"]["2145123"]
 	id = ctx.chat.id.toString()
 	let keyboard2 = []
 	for (let i = 0; i < keyboard.length; i++) {
@@ -446,6 +440,4 @@ setInterval(() => {
 		console.log(data["game_started"])
 	}
 }, 5000)
-} catch {
-	console.log("Hmm, error")
-}
+
