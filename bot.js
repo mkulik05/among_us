@@ -8,7 +8,8 @@ let to_arduino = new Gpio(4, 'out');
 let meetingButton = new Gpio(15, 'in', 'both');
 let from_arduino_200 = new Gpio(17, 'in', 'both');
 let from_arduino_404 = new Gpio(27, 'in', 'both');
-to_arduino.writeSync(0);
+try {
+	to_arduino.writeSync(0);
 
 from_arduino_200.watch((err, value) => {
 	console.log('200', value) //Watch for hardware interrupts on meetingButton GPIO, specify callback function
@@ -440,3 +441,6 @@ setInterval(() => {
 		console.log(data["game_started"])
 	}
 }, 5000)
+} catch {
+	console.log("Hmm, error")
+}
