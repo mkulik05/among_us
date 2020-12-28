@@ -88,7 +88,8 @@ let data = {
 	},
 	points: 0,
 	last_sabotage: null,
-	sabotage:0
+	sabotage:0,
+	game_started:0
 }
 // let tasks = {}
 // let players = []
@@ -135,6 +136,7 @@ bot.start((ctx) => {
 })
 
 bot.hears('Начать игру', (ctx) => {
+	data["game_started"] == 1
 	let b = 1
 	let players2 = []
 	for (let i = 0; i < Object.keys(data["players"]).length; i++) {
@@ -269,7 +271,8 @@ bot.hears('Да, удалить все', (ctx) => {
 			},
 			points: 0,
 			last_sabotage: null,
-			sabotage:0
+			sabotage:0,
+			game_started: 0
 		}
 		return ctx.reply('Данные очищены', game_menu())
 	} else {
@@ -429,7 +432,9 @@ let unexportOnClose = () => {
 };
 process.on('SIGINT', unexportOnClose);
 setInterval(() => {
-	let backup = JSON.stringify(data)
-	console.log(backup)
-	fs.writeFileSync("backup.txt", backup)
+	if (data["game_started"] == 1) {
+		let backup = JSON.stringify(data)
+		console.log(backup)
+		fs.writeFileSync("backup.txt", backup)
+	}
 }, 10000)
