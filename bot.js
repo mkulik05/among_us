@@ -136,7 +136,7 @@ bot.start((ctx) => {
 })
 
 bot.hears('Начать игру', (ctx) => {
-	data["game_started"] == 1
+	data["game_started"] = 1
 	let b = 1
 	let players2 = []
 	for (let i = 0; i < Object.keys(data["players"]).length; i++) {
