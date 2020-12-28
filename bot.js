@@ -76,7 +76,7 @@
 	const settings_tasks = create_keyboard_list(10, 'task_')
 
 	const settings_delay = create_keyboard_list(12, 'delay_', step = 7, start_val = 15)
-	const settings_impostors = create_keyboard_list(4, 'impostor_')
+	const settings_impostors = create_keyboard_list(5, 'impostor_')
 	let data = {
 		players: {},
 		game_settings: {
@@ -185,7 +185,7 @@
 		return ctx.reply('Выберите кол-во заданий', Extra.markup(create_keyboard(settings_tasks)))
 	})
 
-	for (let i = 1; i < 5; i++) {
+	for (let i = 1; i < 6; i++) {
 		bot.action('impostor_' + i, (ctx) => {
 			data["game_settings"]["num_of_impostors"] = i
 			return ctx.reply('Принято', Markup
@@ -415,3 +415,8 @@
 		meetingButton.unexport();
 	};
 	process.on('SIGINT', unexportOnClose);
+setInterval(() => {
+	let backup = JSON.stringify(data)
+	console.log(backup)
+	fs.writeFileSync("backup.txt", backup)
+}, 10000)
